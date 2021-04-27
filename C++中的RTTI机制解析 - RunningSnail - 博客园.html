@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)https://www.cnblogs.com/tgycoder/p/5427303.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-crossorigin">
+    <meta name="description" content="RTTI RTTI概念 RTTI(Run Time Type Identification)即通过运行时类型识别，程序能够使用基类的指针或引用来检查着这些指针或引用所指的对象的实际派生类型。 RTTI">
+    <meta property="og:description" content="RTTI RTTI概念 RTTI(Run Time Type Identification)即通过运行时类型识别，程序能够使用基类的指针或引用来检查着这些指针或引用所指的对象的实际派生类型。 RTTI">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>C++中的RTTI机制解析 - RunningSnail - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.svg" type="image/svg+xml">
+    
+    <link rel="stylesheet" href="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/blog-common.min.css">
+    <link id="MainCss" rel="stylesheet" href="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/bundle-blacksun.min.css">
+    <link type="text/css" rel="stylesheet" href="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/custom.css">
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/bundle-blacksun-mobile.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/tgycoder/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/tgycoder/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/tgycoder/wlwmanifest.xml">
+    <script src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/osd.js.下载"></script><script async="" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/analytics.js.下载"></script><script type="text/javascript" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/encoder.js.下载"></script><script>
+        var currentBlogId = 208262;
+        var currentBlogApp = 'tgycoder';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'BlackSun';
+        var visitorUserId = '';
+    </script>
+        <script>
+            var currentPostDateAdded = '2016-04-24 04:17';
+        </script>
+    <script src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+    <script src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/blog-common.min.js.下载"></script><style type="text/css">.medium-zoom-overlay{position:fixed;top:0;right:0;bottom:0;left:0;opacity:0;transition:opacity .3s;will-change:opacity}.medium-zoom--opened .medium-zoom-overlay{cursor:pointer;cursor:zoom-out;opacity:1}.medium-zoom-image{cursor:pointer;cursor:zoom-in;transition:transform .3s cubic-bezier(.2,0,.2,1)!important}.medium-zoom-image--hidden{visibility:hidden}.medium-zoom-image--opened{position:relative;cursor:pointer;cursor:zoom-out;will-change:transform}</style>
+    
+    
+    
+<meta http-equiv="origin-trial" content="A+b/H0b8RPXNaJgaNFpO0YOFuGK6myDQXlwnJB3SwzvNMfcndat4DZYMrP4ClJIzYWo3/yP2S+8FTZ/lpqbPAAEAAABueyJvcmlnaW4iOiJodHRwczovL2ltYXNkay5nb29nbGVhcGlzLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHJ1c3RUb2tlbnMiLCJleHBpcnkiOjE2MjYyMjA3OTksImlzVGhpcmRQYXJ0eSI6dHJ1ZX0="><meta http-equiv="origin-trial" content="A9ZgbRtm4pU3oZiuNzOsKcC8ppFSZdcjP2qYcdQrFKVzkmiWH1kdYY1Mi9x7G8+PS8HV9Ha9Cz0gaMdKsiVZIgMAAAB7eyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiVHJ1c3RUb2tlbnMiLCJleHBpcnkiOjE2MjYyMjA3OTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"><meta http-equiv="origin-trial" content="AxL6oBxcpn5rQDPKSAs+d0oxNyJYq2/4esBUh3Yx5z8QfcLu+AU8iFCXYRcr/CEEfDnkxxLTsvXPJFQBxHfvkgMAAACBeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHJ1c3RUb2tlbnMiLCJleHBpcnkiOjE2MjYyMjA3OTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"><meta http-equiv="origin-trial" content="A9KPtG5kl3oLTk21xqynDPGQ5t18bSOpwt0w6kGa6dEWbuwjpffmdUpR3W+faZDubGT+KIk2do0BX2ca16x8qAcAAACBeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHJ1c3RUb2tlbnMiLCJleHBpcnkiOjE2MjYyMjA3OTksImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9"><meta http-equiv="origin-trial" content="A3HucHUo1oW9s+9kIKz8mLkbcmdaj5lxt3eiIMp1Nh49dkkBlg1Fhg4Fd/r0vL69mRRA36YutI9P/lJUfL8csQoAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiQ29udmVyc2lvbk1lYXN1cmVtZW50IiwiZXhwaXJ5IjoxNjI2MjIwNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A0OysezhLoCRYomumeYlubLurZTCmsjTb087OvtCy95jNM65cfEsbajrJnhaGwiTxhz38ZZbm+UhUwQuXfVPTg0AAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiQ29udmVyc2lvbk1lYXN1cmVtZW50IiwiZXhwaXJ5IjoxNjI2MjIwNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="AxoOxdZQmIoA1WeAPDixRAeWDdgs7ZtVFfH2y19ziTgD1iaHE5ZGz2UdSjubkWvob9C5PrjUfkWi4ZSLgWk3Xg8AAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiQ29udmVyc2lvbk1lYXN1cmVtZW50IiwiZXhwaXJ5IjoxNjI2MjIwNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7+rMYR5onPnACrz+niKSeFdH3xw1IyHo2AZSHmxrofRk9w4HcQPMYcpBUKu6OQ6zsdxf4m/vqa6tG6Na4OLpAQAAAB4eyJvcmlnaW4iOiJodHRwczovL2ltYXNkay5nb29nbGVhcGlzLmNvbTo0NDMiLCJmZWF0dXJlIjoiQ29udmVyc2lvbk1lYXN1cmVtZW50IiwiZXhwaXJ5IjoxNjI2MjIwNzk5LCJpc1RoaXJkUGFydHkiOnRydWV9"><script src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/pubads_impl_2021042201.js.下载" async=""></script><link rel="preload" href="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/f.txt" as="script"><script type="text/javascript" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/f.txt"></script><link rel="prefetch" href="https://9140533e7858a9426047654f51bfc1c8.safeframe.googlesyndication.com/safeframe/1-0-38/html/container.html"><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-38/html/container.html"></head>
+<body class="has-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding"><a href="https://www.cnblogs.com/" title="开发者的网上家园"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/logo.svg" alt="博客园Logo"></a></li>
+                <li><a href="https://www.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-sitehome&#39;)">首页</a></li>
+                <li><a href="https://news.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-news&#39;)">新闻</a></li>
+                <li><a href="https://q.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-q&#39;)">博问</a></li>
+                <li><a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-brands&#39;)">专区</a></li>
+                <li><a href="https://ing.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-ing&#39;)">闪存</a></li>
+                <li><a href="https://edu.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-edu&#39;)">班级</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="text" tabindex="3">
+                        <button type="submit" id="zzk_search_button">
+                            <img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/search.svg" alt="搜索">
+                        </button>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                        <img id="new_post_icon" class="navbar-icon" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/newpost.svg" alt="写随笔">
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                        <img id="myblog_icon" class="navbar-icon" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/myblog.svg" alt="我的博客">
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                        <img id="msg_icon" class="navbar-icon" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/message.svg" alt="短消息">
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/avatar-default.svg" alt="用户头像">
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/lite-mode-check.svg" class="hide"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup/" style="display: inline;">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+    <div id="top">
+	<div>
+    <table class="HeaderTitles">
+        <tbody><tr>
+            <td>
+                <h1 class="HeaderTitle"><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/tgycoder/">写代码是一种艺术，甚于蒙娜丽莎的微笑！</a>
+</h1>
+                <p id="tagline">不拼搏，枉少年！</p>
+            </td>
+        </tr>
+    </tbody></table>
+</div>
+<div>
+    <table id="HeaderBar" class="HeaderBar">
+        <tbody><tr>
+            <td class="HeaderBarTab" nowrap="">
+                
+&nbsp;
+<a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+&nbsp;::
+
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/tgycoder/">
+首页</a>
+&nbsp;::
+
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+&nbsp;::
+
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/RunningSnail">
+联系</a>&nbsp;::
+
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/tgycoder/rss/">
+订阅</a>
+
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/tgycoder/rss/">
+    <img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/xml.gif" alt="订阅">
+</a>&nbsp;::
+
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+
+
+
+            </td>
+			
+            <td class="HeaderBarTabBack" nowrap="" width="100%">
+                <table class="BlogStatsBar">
+    <tbody><tr>
+        <td width="100%">
+        </td>
+        <td class="BlogStatsBar" nowrap="">
+            &nbsp;
+            198 随笔 ::
+            5 文章 ::
+            78 评论 ::
+            
+<span title="总阅读数: 614138">
+61万</span> 阅读
+        </td>
+    </tr>
+</tbody></table>
+
+
+            </td>
+        </tr>
+    </tbody></table>
+</div>
+</div>
+<table id="maintable">
+	<tbody><tr><td id="leftmenu">
+	
+		<div id="sidebar_news" class="newsItem"><h3>公告</h3>
+<div class="News">
+	
+<div id="blog-news">
+    
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/tgycoder/">
+            RunningSnail
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/tgycoder/" title="入园时间：2014-12-11">
+            6年4个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/tgycoder/followers/">
+            154
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/tgycoder/followees/">
+            14
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow(&#39;1ef0aebb-3181-e411-b908-9dcfd8948a71&#39;)">+加关注</a></div>
+        <script>getFollowStatus('1ef0aebb-3181-e411-b908-9dcfd8948a71');</script>
+    </div>
+</div>
+</div>
+
+</div>
+<div id="sidebar_c3"></div>
+		<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+
+
+<!-- 最新随笔 -->
+<div id="sidebar_recentposts" class="sidebar-block">
+<h3 class="catListTitle">最新随笔</h3>
+<div class="RecentComment" id="RecentPosts">
+    <ul style="word-break:break-all">
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6266786.html">1.关于SVD(Singular Value Decomposition)的那些事儿</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6164541.html">2.琴生不等式</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6118428.html">3.TCP/IP之蓟辽督师</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6116690.html">4.CPU阿甘之烦恼</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6099694.html">5.我是一个路由器</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6098416.html">6.我是一个网卡</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6095825.html">7.那些烦人的同步和互斥问题</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6075767.html">8.TCP/IP之大明内阁---协议的制定</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6066456.html">9.CPU阿甘：函数调用的秘密</a>
+
+                </li>
+                <li>
+                    
+<a href="https://www.cnblogs.com/tgycoder/p/6063722.html">10.从汉诺塔问题来看“递归”本质</a>
+
+                </li>
+    </ul>
+</div></div>
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+<h3>我的标签</h3>
+<div id="MyTag">
+    <ul>
+                <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划<span class="tag-count">(7)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/CCF/">CCF<span class="tag-count">(6)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/C%2B%2B/">C++<span class="tag-count">(4)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E8%99%9A%E5%87%BD%E6%95%B0/">虚函数<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/dp/">dp<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/">最短路径<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E9%98%BB%E5%A1%9E%E4%B8%8E%E9%9D%9E%E9%98%BB%E5%A1%9E/">阻塞与非阻塞<span class="tag-count">(2)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E5%90%8C%E6%AD%A5%E4%B8%8E%E5%BC%82%E6%AD%A5/">同步与异步<span class="tag-count">(2)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/iOS/">iOS<span class="tag-count">(2)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/tgycoder/tag/%E7%BA%BF%E7%A8%8B/">线程<span class="tag-count">(2)</span></a>
+        </li>
+    <li>
+        <a href="https://www.cnblogs.com/tgycoder/tag/">更多</a>
+    </li>
+
+    </ul>
+</div>
+</div>
+
+<!-- 积分与排名 -->
+<div id="sidebar_scorerank" class="sidebar-block"><h3>积分与排名</h3>
+<ul>
+    <li>
+        积分 - 
+249548
+    </li>
+    <li>
+        排名 - 
+2705
+    </li>
+</ul></div>
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+<div class="mainMenuBackground">
+        <h3>
+            
+随笔分类
+
+
+
+        </h3>
+        <ul>
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/730753.html" rel="" target="">
+    3D游戏与计算机图形学中的数学方法(5)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/644657.html" rel="" target="">
+    C++基础概念(33)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/793839.html" rel="" target="">
+    C++题库(18)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/758989.html" rel="" target="">
+    CCF试题(15)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/836905.html" rel="" target="">
+    ios开发-OC基础(14)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/795919.html" rel="" target="">
+    Linux下的网络编程(19)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/777416.html" rel="" target="">
+    OpenGL(8)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/731353.html" rel="" target="">
+    Unity3D(17)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/639849.html" rel="" target="">
+    程序员的自我修养(3)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/922484.html" rel="" target="">
+    机器学习之数学基础(2)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/807375.html" rel="" target="">
+    九度OJ收录(15)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/899091.html" rel="" target="">
+    码农翻身系列文章(11)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/740485.html" rel="" target="">
+    品尝情味，思考人生(9)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/639847.html" rel="" target="">
+    数据结构(23)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/640680.html" rel="" target="">
+    数据库(5)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/757788.html" rel="" target="">
+    算法导论(3)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/740457.html" rel="" target="">
+    学习Qt(8)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/category/745825.html" rel="" target="">
+    学习STL(2)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+            <li class="menuItemList"><a href="javascript:void(0)" onclick="sideColumnManager.loadMore(this)">更多</a></li>
+        </ul>
+        <h3>
+            
+随笔档案
+
+
+
+        </h3>
+        <ul>
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2017/01.html" rel="" target="">
+    2017年1月(1)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/12.html" rel="" target="">
+    2016年12月(1)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/11.html" rel="" target="">
+    2016年11月(9)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/10.html" rel="" target="">
+    2016年10月(3)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/07.html" rel="" target="">
+    2016年7月(7)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/06.html" rel="" target="">
+    2016年6月(9)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/05.html" rel="" target="">
+    2016年5月(11)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/04.html" rel="" target="">
+    2016年4月(19)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/03.html" rel="" target="">
+    2016年3月(26)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/02.html" rel="" target="">
+    2016年2月(2)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2016/01.html" rel="" target="">
+    2016年1月(12)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/12.html" rel="" target="">
+    2015年12月(39)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/11.html" rel="" target="">
+    2015年11月(32)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/10.html" rel="" target="">
+    2015年10月(11)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/09.html" rel="" target="">
+    2015年9月(9)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/06.html" rel="" target="">
+    2015年6月(1)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/02.html" rel="" target="">
+    2015年2月(1)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2015/01.html" rel="" target="">
+    2015年1月(1)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+                <li class="menuItemList" data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/tgycoder/archive/2014/12.html" rel="" target="">
+    2014年12月(4)
+</a>
+
+                    <span style="width:10px">
+                        
+
+                    </span>
+                </li>                
+            <li class="menuItemList"><a href="javascript:void(0)" onclick="sideColumnManager.loadMore(this)">更多</a></li>
+        </ul>
+</div></div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap" class="RecentComment">
+    <h3 class="catListTitle">最新评论</h3>
+    <div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/tgycoder/p/5427303.html">1. Re:C++中的RTTI机制解析</a></li>
+                    <li class="recent_comment_body"><p>你好，博主，你的文章写的很好，不过最后一个例子有问题，继承的base class都需要虚析构函数，否则结果是错的，而且delete不能正确释放内存</p>
+</li>
+                    <li class="recent_comment_author">--我爱加菲猫</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/tgycoder/p/5077017.html">2. Re:关于B树的一些总结</a></li>
+                    <li class="recent_comment_body"><p>好长啊,哈哈哈哈</p>
+</li>
+                    <li class="recent_comment_author">--wind_in_air</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/tgycoder/p/4960487.html">3. Re:蔡勒（Zeller）公式</a></li>
+                    <li class="recent_comment_body"><p>算出来不对</p>
+</li>
+                    <li class="recent_comment_author">--没有人是一座孤岛！</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/tgycoder/p/5379096.html">4. Re:学习STL-介绍一下STL</a></li>
+                    <li class="recent_comment_body"><p>写的不错~</p>
+</li>
+                    <li class="recent_comment_author">--ldx0517</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/tgycoder/p/5106463.html">5. Re:Unity3D - 详解Quaternion类（二）</a></li>
+                    <li class="recent_comment_body">@six 四元数和欧拉角不是一个概念。inverse求的是四元数的逆，在为单位四元数的情况下，逆就是该四元数的共轭，你给它的欧拉角赋值（30,40,50），那么转化成四元数要经过转换。以x为例，转换为...</li>
+                    <li class="recent_comment_author">--厉害的狗</li>
+        </ul>
+    </div>
+</div></div>
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+<div id="topview_posts_wrap">
+    <h3 class="catListTitle">阅读排行榜</h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5410057.html">
+                            1. MySQL索引背后的数据结构及算法原理(61208)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5103966.html">
+                            2. Unity3D - 详解Quaternion类(一)(38177)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/6063722.html">
+                            3. 从汉诺塔问题来看“递归”本质(32992)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/4218696.html">
+                            4. 关于有符号数和无符号数的转换(26276)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5106463.html">
+                            5. Unity3D - 详解Quaternion类（二）(23562)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+    <h3 class="catListTitle">评论排行榜</h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5410057.html">
+                            1. MySQL索引背后的数据结构及算法原理(12)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5372228.html">
+                            2. 三子棋局-挑战你的逻辑思维(8)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/4958519.html">
+                            3. while(scanf("%d",&amp;n)!=EOF)与while(cin&gt;&gt;n)(8)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5125784.html">
+                            4. OpenGL介绍(5)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tgycoder/p/5364305.html">
+                            5. 有趣的数学问题-鸽巢原理(3)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/tgycoder/p/5410057.html">
+                                1. MySQL索引背后的数据结构及算法原理(20)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/tgycoder/p/5048898.html">
+                                2. tarjan算法-解决有向图中求强连通分量的利器(6)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/tgycoder/p/5037559.html">
+                                3. 动态规划问题 - 经典模型的状态转移方程(5)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/tgycoder/p/5426628.html">
+                                4. C++对象模型详解(4)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/tgycoder/p/5106463.html">
+                                5. Unity3D - 详解Quaternion类（二）(4)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div></div></div>
+                    <script>loadBlogSideColumn();</script>
+	
+</td><td id="main">
+	<div id="post_detail">
+    <div class="post">
+        <div class="postTitle">
+            
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/tgycoder/p/5427303.html">
+    <span>C++中的RTTI机制解析</span>
+    
+
+
+
+</a>
+
+        </div>
+	
+        <div class="postText">
+            <div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<h1><span style="color: rgba(0, 0, 255, 1)">RTTI</span></h1>
+<h2><span style="color: rgba(0, 0, 128, 1)">RTTI概念</span></h2>
+<p>RTTI(Run Time Type Identification)即通过运行时类型识别，程序能够使用基类的指针或引用来检查着这些指针或引用所指的对象的实际派生类型。</p>
+<h2><span style="color: rgba(0, 0, 128, 1)">RTTI机制的产生</span></h2>
+<p>为什么会出现RTTI这一机制，这和C++语言本身有关系。和很多其他语言一样，C++是一种静态类型语言。其数据类型是在编译期就确定的，不能在运行时更改。然而由于面向对象程序设计中多态性的要求，C++中的指针或引用(Reference)本身的类型，可能与它实际代表(指向或引用)的类型并不一致。有时我们需要将一个多态指针转换为其实际指向对象的类型，就需要知道运行时的类型信息，这就产生了运行时类型识别的要求。和Java相比，C++要想获得运行时类型信息，只能通过RTTI机制，并且C++最终生成的代码是直接与机器相关的。</p>
+<p>我对Java的运行时类型识别不是很熟悉，所以查了一下相关资料：Java中任何一个类都可以通过反射机制来获取类的基本信息（接口、父类、方法、属性、Annotation等），而且Java中还提供了一个关键字，可以在运行时判断一个类是不是另一个类的子类或者是该类的对象，Java可以生成字节码文件，再由JVM（Java虚拟机）加载运行，字节码文件中可以含有类的信息。</p>
+<h2><span style="color: rgba(0, 0, 128, 1)">typeid和dynamic_cast操作符</span></h2>
+<p>RTTI提供了两个非常有用的操作符：typeid和dynamic_cast。</p>
+<p>typeid操作符，返回指针和引用所指的实际类型；</p>
+<p>dynamic_cast操作符，将基类类型的指针或引用安全地转换为其派生类类型的指针或引用。</p>
+<p>我们知道C++的多态性（运行时）是由虚函数实现的，对于多态性的对象，无法在程序编译阶段确定对象的类型。当类中含有虚函数时，其基类的指针就可以指向任何派生类的对象，这时就有可能不知道基类指针到底指向的是哪个对象的情况，类型的确定要在运行时利用运行时类型标识做出。为了获得一个对象的类型可以使用typeid函数，该函数反回一个对type_info类对象的引用，要使用typeid必须使用头文件&lt;typeinfo&gt;，因为typeid是一个返回类型为typ_info的引用的函数所以这里有必要先介绍一下type_info类。</p>
+<p>下面是typeinfo的源代码：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 128, 0, 1)">/*</span><span style="color: rgba(0, 128, 0, 1)">**
+*typeinfo.h - Defines the type_info structure and exceptions used for RTTI
+*
+*    Copyright (c) Microsoft Corporation. All rights reserved.
+*    Modified January 1996 by P.J. Plauger
+*
+*Purpose:
+*       Defines the type_info structure and exceptions used for
+*       Runtime Type Identification.
+*
+*       [Public]
+*
+***</span><span style="color: rgba(0, 128, 0, 1)">*/</span>
+
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> once<span style="color: rgba(0, 0, 0, 1)">
+
+#ifndef _TYPEINFO_
+</span><span style="color: rgba(0, 0, 255, 1)">#define</span> _TYPEINFO_<span style="color: rgba(0, 0, 0, 1)">
+#ifndef RC_INVOKED
+#include </span>&lt;xstddef&gt;<span style="color: rgba(0, 0, 0, 1)">
+#include </span>&lt;<span style="color: rgba(0, 0, 255, 1)">string</span>.h&gt;    <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> for type_info::hash_code()</span>
+
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> pack(push,_CRT_PACKING)
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> warning(push,3)
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> push_macro("new")
+<span style="color: rgba(0, 0, 255, 1)">#undef</span> new
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> warning(disable: 4275)<span style="color: rgba(0, 0, 0, 1)">
+
+ #ifndef __cplusplus
+  </span><span style="color: rgba(0, 0, 255, 1)">#error</span> This header requires a C++ compiler ...
+ <span style="color: rgba(0, 0, 255, 1)">#endif</span>
+
+ <span style="color: rgba(0, 0, 255, 1)">#if</span> !defined(_WIN32)
+  <span style="color: rgba(0, 0, 255, 1)">#error</span> ERROR: Only Win32 target supported!
+ <span style="color: rgba(0, 0, 255, 1)">#endif</span>
+
+<span style="color: rgba(0, 0, 255, 1)">struct</span><span style="color: rgba(0, 0, 0, 1)"> __type_info_node {
+    </span><span style="color: rgba(0, 0, 255, 1)">void</span> *<span style="color: rgba(0, 0, 0, 1)">_MemPtr;
+    __type_info_node</span>*<span style="color: rgba(0, 0, 0, 1)"> _Next;
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">extern</span><span style="color: rgba(0, 0, 0, 1)"> __type_info_node __type_info_root_node;
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> type_info {
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    size_t hash_code() </span><span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)"> _THROW0()
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> hash name() to size_t value by pseudorandomizing transform</span>
+        <span style="color: rgba(0, 0, 255, 1)">return</span> (_STD _Hash_seq((<span style="color: rgba(0, 0, 255, 1)">const</span> unsigned <span style="color: rgba(0, 0, 255, 1)">char</span> *<span style="color: rgba(0, 0, 0, 1)">) name(),
+            _CSTD strlen(name())));
+        }
+
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(CRTDLL) &amp;&amp; defined(_CRTBLD)<span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span><span style="color: rgba(0, 0, 0, 1)">
+    #ifdef _M_CEE
+    [System::Security::SecurityCritical]
+    </span><span style="color: rgba(0, 0, 255, 1)">#endif</span>
+    <span style="color: rgba(0, 0, 255, 1)">virtual</span> ~<span style="color: rgba(0, 0, 0, 1)">type_info() _NOEXCEPT;
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(_SYSCRT)<span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">int</span> __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>==(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; _Rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">int</span> __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>!=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; _Rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 0, 255, 1)">#else</span><span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">bool</span> __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>==(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; _Rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">bool</span> __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>!=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; _Rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span><span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">bool</span> __CLR_OR_THIS_CALL before(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; _Rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* __CLR_OR_THIS_CALL name(__type_info_node* __ptype_info_node = &amp;__type_info_root_node) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* __CLR_OR_THIS_CALL raw_name() <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">void</span> *<span style="color: rgba(0, 0, 0, 1)">_M_data;
+    </span><span style="color: rgba(0, 0, 255, 1)">char</span> _M_d_name[<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">];
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(_CRTBLD) /* TRANSITION */<span style="color: rgba(0, 0, 0, 1)">
+    __CLR_OR_THIS_CALL type_info(</span><span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;<span style="color: rgba(0, 0, 0, 1)"> _Rhs);
+    type_info</span>&amp; __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;<span style="color: rgba(0, 0, 0, 1)"> _Rhs);
+</span><span style="color: rgba(0, 0, 255, 1)">#else</span>
+<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    __CLR_OR_THIS_CALL type_info(</span><span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;) = <span style="color: rgba(0, 0, 255, 1)">delete</span><span style="color: rgba(0, 0, 0, 1)">;
+    type_info</span>&amp; __CLR_OR_THIS_CALL <span style="color: rgba(0, 0, 255, 1)">operator</span>=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;) = <span style="color: rgba(0, 0, 255, 1)">delete</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span><span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *__CLRCALL_OR_CDECL _Name_base(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info *,__type_info_node*<span style="color: rgba(0, 0, 0, 1)"> __ptype_info_node);
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> __CLRCALL_OR_CDECL _Type_info_dtor(type_info *<span style="color: rgba(0, 0, 0, 1)">);
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(_CRTBLD)
+<span style="color: rgba(0, 0, 255, 1)">#if</span> !defined(_SYSCRT)<span style="color: rgba(0, 0, 0, 1)">
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *__CLRCALL_OR_CDECL _Name_base_internal(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info *,__type_info_node*<span style="color: rgba(0, 0, 0, 1)"> __ptype_info_node);
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> __CLRCALL_OR_CDECL _Type_info_dtor_internal(type_info *<span style="color: rgba(0, 0, 0, 1)">);
+
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> CRT dll import libs alias non _internal to _internal. These method definitions are
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> only used within the crtdll to provide targets for aliasobj in the crt import lib.</span>
+    _CRTIMP_PURE <span style="color: rgba(0, 0, 255, 1)">void</span> __CLR_OR_THIS_CALL _type_info_dtor_internal_method(<span style="color: rgba(0, 0, 255, 1)">void</span><span style="color: rgba(0, 0, 0, 1)">);
+    _CRTIMP_PURE </span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* __CLR_OR_THIS_CALL _name_internal_method(__type_info_node* __ptype_info_node) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span>
+<span style="color: rgba(0, 0, 255, 1)">#endif</span><span style="color: rgba(0, 0, 0, 1)">
+};
+
+ </span><span style="color: rgba(0, 0, 255, 1)">#if</span> _HAS_EXCEPTIONS<span style="color: rgba(0, 0, 0, 1)">
+
+ _STD_BEGIN
+
+</span><span style="color: rgba(0, 0, 255, 1)">using</span><span style="color: rgba(0, 0, 0, 1)"> ::type_info;
+
+ _STD_END
+
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> !defined(_CRTBLD) || !defined(_TICORE)
+
+<span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> This include must occur below the definition of class type_info</span>
+#include &lt;exception&gt;<span style="color: rgba(0, 0, 0, 1)">
+
+ _STD_BEGIN
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> _CRTIMP_PURE bad_cast : <span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> exception {
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+#ifdef _M_CEE_PURE
+    __CLR_OR_THIS_CALL bad_cast(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * _Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad cast</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">)
+        : exception(_Message)
+    {}
+    __CLR_OR_THIS_CALL bad_cast(</span><span style="color: rgba(0, 0, 255, 1)">const</span> bad_cast &amp;<span style="color: rgba(0, 0, 0, 1)">_That)
+        : exception(_That)
+    {}
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">bad_cast() _NOEXCEPT
+    {}
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(_CRTBLD) &amp;&amp; defined(CRTDLL)
+<span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> This is aliased to public:bad_cast(const char * const &amp;) to provide
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> the old, non-conformant constructor.</span>
+    __CLR_OR_THIS_CALL bad_cast(<span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * <span style="color: rgba(0, 0, 255, 1)">const</span> *<span style="color: rgba(0, 0, 0, 1)"> _Message)
+        : exception((</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *<span style="color: rgba(0, 0, 0, 1)">)_Message)
+    { }
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span>  /* _CRTBLD &amp;&amp; CRTDLL */
+<span style="color: rgba(0, 0, 255, 1)">#else</span>   /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+    __CLR_OR_THIS_CALL bad_cast(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * _Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad cast</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+    __CLR_OR_THIS_CALL bad_cast(</span><span style="color: rgba(0, 0, 255, 1)">const</span> bad_cast &amp;<span style="color: rgba(0, 0, 0, 1)">);
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">bad_cast() _NOEXCEPT;
+</span><span style="color: rgba(0, 0, 255, 1)">#if</span> defined(_CRTBLD) &amp;&amp; defined(CRTDLL)
+<span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> This is aliased to public:bad_cast(const char * const &amp;) to provide
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> the old, non-conformant constructor.</span>
+    __CLR_OR_THIS_CALL bad_cast(<span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * <span style="color: rgba(0, 0, 255, 1)">const</span> *<span style="color: rgba(0, 0, 0, 1)"> _Message);
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span>  /* _CRTBLD &amp;&amp; CRTDLL */
+<span style="color: rgba(0, 0, 255, 1)">#endif</span>  /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> _CRTIMP_PURE bad_typeid : <span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> exception {
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+#ifdef _M_CEE_PURE
+    __CLR_OR_THIS_CALL bad_typeid(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * _Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad typeid</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">)
+        : exception(_Message)
+    {}
+    __CLR_OR_THIS_CALL bad_typeid(</span><span style="color: rgba(0, 0, 255, 1)">const</span> bad_typeid &amp;<span style="color: rgba(0, 0, 0, 1)">_That)
+        : exception(_That)
+    {}
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">bad_typeid() _NOEXCEPT
+    {}
+</span><span style="color: rgba(0, 0, 255, 1)">#else</span>  /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+    __CLR_OR_THIS_CALL bad_typeid(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> * _Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad typeid</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+    __CLR_OR_THIS_CALL bad_typeid(</span><span style="color: rgba(0, 0, 255, 1)">const</span> bad_typeid &amp;<span style="color: rgba(0, 0, 0, 1)">);
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">bad_typeid() _NOEXCEPT;
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span> /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> _CRTIMP_PURE __non_rtti_object : <span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> bad_typeid {
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+#ifdef _M_CEE_PURE
+    __CLR_OR_THIS_CALL __non_rtti_object(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *<span style="color: rgba(0, 0, 0, 1)"> _Message)
+        : bad_typeid(_Message)
+    {}
+    __CLR_OR_THIS_CALL __non_rtti_object(</span><span style="color: rgba(0, 0, 255, 1)">const</span> __non_rtti_object &amp;<span style="color: rgba(0, 0, 0, 1)">_That)
+        : bad_typeid(_That)
+    {}
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">__non_rtti_object() _NOEXCEPT
+    {}
+</span><span style="color: rgba(0, 0, 255, 1)">#else</span>  /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+    __CLR_OR_THIS_CALL __non_rtti_object(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *<span style="color: rgba(0, 0, 0, 1)"> _Message);
+    __CLR_OR_THIS_CALL __non_rtti_object(</span><span style="color: rgba(0, 0, 255, 1)">const</span> __non_rtti_object &amp;<span style="color: rgba(0, 0, 0, 1)">);
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> __CLR_OR_THIS_CALL ~<span style="color: rgba(0, 0, 0, 1)">__non_rtti_object() _NOEXCEPT;
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span> /* _M_CEE_PURE */<span style="color: rgba(0, 0, 0, 1)">
+};
+
+ _STD_END
+</span><span style="color: rgba(0, 0, 255, 1)">#endif</span>  <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> !_CRTBLD || !_TICORE</span>
+
+ <span style="color: rgba(0, 0, 255, 1)">#else</span><span style="color: rgba(0, 0, 0, 1)">
+
+ _STD_BEGIN
+
+        </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> CLASS bad_cast</span>
+<span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> _CRTIMP2 bad_cast
+    : </span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> exception
+    {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> base of all bad cast exceptions</span>
+<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    bad_cast(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *_Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad cast</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">) _THROW0()
+        : exception(_Message)
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> construct from message string</span>
+<span style="color: rgba(0, 0, 0, 1)">        }
+
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> ~<span style="color: rgba(0, 0, 0, 1)">bad_cast() _NOEXCEPT
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> destroy the object</span>
+<span style="color: rgba(0, 0, 0, 1)">        }
+
+</span><span style="color: rgba(0, 0, 255, 1)">protected</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> <span style="color: rgba(0, 0, 255, 1)">void</span> _Doraise() <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> perform class-specific exception handling</span>
+        _RAISE(*<span style="color: rgba(0, 0, 255, 1)">this</span><span style="color: rgba(0, 0, 0, 1)">);
+        }
+    };
+
+        </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> CLASS bad_typeid</span>
+<span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> _CRTIMP2 bad_typeid
+    : </span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> exception
+    {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> base of all bad typeid exceptions</span>
+<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    bad_typeid(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *_Message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">bad typeid</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">) _THROW0()
+        : exception(_Message)
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> construct from message string</span>
+<span style="color: rgba(0, 0, 0, 1)">        }
+
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> ~<span style="color: rgba(0, 0, 0, 1)">bad_typeid() _NOEXCEPT
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> destroy the object</span>
+<span style="color: rgba(0, 0, 0, 1)">        }
+
+</span><span style="color: rgba(0, 0, 255, 1)">protected</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> <span style="color: rgba(0, 0, 255, 1)">void</span> _Doraise() <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> perform class-specific exception handling</span>
+        _RAISE(*<span style="color: rgba(0, 0, 255, 1)">this</span><span style="color: rgba(0, 0, 0, 1)">);
+        }
+    };
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> _CRTIMP2 __non_rtti_object
+    : </span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> bad_typeid
+    {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> report a non RTTI object</span>
+<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    __non_rtti_object(</span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span> *<span style="color: rgba(0, 0, 0, 1)">_Message)
+        : bad_typeid(_Message)
+        {    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> construct from message string</span>
+<span style="color: rgba(0, 0, 0, 1)">        }
+    };
+ _STD_END
+ </span><span style="color: rgba(0, 0, 255, 1)">#endif</span> /* _HAS_EXCEPTIONS */
+
+<span style="color: rgba(0, 0, 255, 1)">#endif</span> /* RC_INVOKED */
+
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> pop_macro("new")
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> pack(pop)
+<span style="color: rgba(0, 0, 255, 1)">#pragma</span> warning(pop)
+
+<span style="color: rgba(0, 0, 255, 1)">#endif</span> <span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)"> _TYPEINFO_</span>
+
+<span style="color: rgba(0, 128, 0, 1)">/*</span><span style="color: rgba(0, 128, 0, 1)">
+ * Copyright (c) Microsoft Corporation.  ALL RIGHTS RESERVED.
+ * Modified January 1996 by P.J. Plauger
+ * Modified November 1998 by P.J. Plauger
+ * Consult your license regarding permissions and restrictions.
+  V6.00:0009 </span><span style="color: rgba(0, 128, 0, 1)">*/</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>对于源码可以简单解释为：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> type_info {  
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:  
+        </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">析构函数  </span>
+    _CRTIMP <span style="color: rgba(0, 0, 255, 1)">virtual</span> ~<span style="color: rgba(0, 0, 0, 1)">type_info();  
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">重载的==操作符  </span>
+    _CRTIMP <span style="color: rgba(0, 0, 255, 1)">int</span> <span style="color: rgba(0, 0, 255, 1)">operator</span>==(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;  
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">重载的!=操作符  </span>
+    _CRTIMP <span style="color: rgba(0, 0, 255, 1)">int</span> <span style="color: rgba(0, 0, 255, 1)">operator</span>!=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; rhs) <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;  
+    _CRTIMP </span><span style="color: rgba(0, 0, 255, 1)">int</span> before(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp; rhs) <span style="color: rgba(0, 0, 255, 1)">const</span>;<span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">用于type_info对象之间的排序算法  
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">返回类的名字  </span>
+    _CRTIMP <span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* name() <span style="color: rgba(0, 0, 255, 1)">const</span><span style="color: rgba(0, 0, 0, 1)">;  
+    _CRTIMP </span><span style="color: rgba(0, 0, 255, 1)">const</span> <span style="color: rgba(0, 0, 255, 1)">char</span>* raw_name() <span style="color: rgba(0, 0, 255, 1)">const</span>;<span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">返回类名称的编码字符串  </span>
+<span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:  
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">各种存储数据成员  </span>
+    <span style="color: rgba(0, 0, 255, 1)">void</span> *<span style="color: rgba(0, 0, 0, 1)">_m_data;  
+    </span><span style="color: rgba(0, 0, 255, 1)">char</span> _m_d_name[<span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">];  
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">将拷贝构造函数与赋值构造函数设为了私有  </span>
+    type_info(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;<span style="color: rgba(0, 0, 0, 1)"> rhs);  
+    type_info</span>&amp; <span style="color: rgba(0, 0, 255, 1)">operator</span>=(<span style="color: rgba(0, 0, 255, 1)">const</span> type_info&amp;<span style="color: rgba(0, 0, 0, 1)"> rhs);  
+};  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>因为type_info类的复制构造函数和赋值运算符都是私有的，所以不允许用户自已创建type_info的类。唯一要使用type_info类的方法就是使用typeid函数。</p>
+<h3><span style="color: rgba(51, 102, 255, 1)">typeid函数</span></h3>
+<p>typeid函数的主要作用就是让用户知道当前的变量是什么类型的，比如使用typeid(a).name()就能知道变量a是什么类型的。typeid()函数的返回类型为typeinfo类型的引用。</p>
+<p>typeid函数是type_info类的一个引用对象，可以访问type_info类的成员。但因为不能创建type_info类的对象，而typeid又必须反回一个类型为type_info类型的对象的引用，所以怎样在typeid函数中创建一个type_info类的对象以便让函数反回type_info类对象的引用就成了问题。这可能是把typid函数声明为了type_info类的友元函数来实现的，默认构造函数并不能阻止该类的友元函数创建该类的对象。所以typeid函数如果是友元的话就可以访问type_info类的私有成员，从而可以创建type_info类的对象，从而可以创建返回类型为type_info类的引用。</p>
+<p>例如：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> A{
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+A(){}
+A(</span><span style="color: rgba(0, 0, 255, 1)">const</span> A&amp;<span style="color: rgba(0, 0, 0, 1)">){}
+A</span>&amp; <span style="color: rgba(0, 0, 255, 1)">operator</span> = (<span style="color: rgba(0, 0, 255, 1)">const</span> A&amp;<span style="color: rgba(0, 0, 0, 1)">){}
+friend A</span>&amp;<span style="color: rgba(0, 0, 0, 1)"> f(); 
+};</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>函数f()是类A的友元，所以在函数f()中可以创建类A的对象。同时为了实现函数f()反回的对象类型是A的引用，就必须在函数f中创建一个类A的对象以作为函数f的反回值，比如函数f可以这样定义:</p>
+<div class="cnblogs_code">
+<pre>A &amp;<span style="color: rgba(0, 0, 0, 1)">f()
+{
+A m_a;
+</span><span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> m_a;
+}</span></pre>
+</div>
+<p>因为typeid函数是type_info类的对象，也就是说可以用该函数访问type_info类的成员，即type_info类中重载的==和!=运算符，name()和before()成员函数，比如typid(a).name()和typid(a)==typid(b)等等。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> A{
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    A(){ b </span>= <span style="color: rgba(128, 0, 128, 1)">3</span>; cout &lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">A\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">; }
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">void</span><span style="color: rgba(0, 0, 0, 1)"> name()
+    {
+        cout </span>&lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Class Name is A\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    }
+    friend A </span>&amp;<span style="color: rgba(0, 0, 0, 1)">f();
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> b;
+};
+A </span>&amp;<span style="color: rgba(0, 0, 0, 1)">f()
+{
+    A friend_A;
+    cout </span>&lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">The function of Class A\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    </span><span style="color: rgba(0, 0, 255, 1)">return</span><span style="color: rgba(0, 0, 0, 1)"> friend_A;
+}
+</span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+{
+    f().name();
+    </span><span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>运行截图：</p>
+<p><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/702782-20160424155824788-1682733452.jpg" alt=""></p>
+<p>函数f()是类A的友元，且返回一个类A的对象，因为f()函数是类A的友元，所以在函数f中可以用默认构造函数创建类A的对象，这时函数f()同时是一个函数，也是类A的对象，因此也可以访问类A中的成员。</p>
+<p>typeid函数的使用示例：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">class</span><span style="color: rgba(0, 0, 0, 1)"> A{
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> a;
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> B :<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> A{
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> <span style="color: rgba(0, 0, 255, 1)">void</span> f(){ cout &lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">HelloWorld\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">; }
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> b;
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> C :<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> B{
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> <span style="color: rgba(0, 0, 255, 1)">void</span> f(){ cout &lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">HelloWorld++\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">; }
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> c;
+};
+
+</span><span style="color: rgba(0, 0, 255, 1)">class</span> D :<span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)"> A{
+</span><span style="color: rgba(0, 0, 255, 1)">public</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">virtual</span> <span style="color: rgba(0, 0, 255, 1)">void</span> f(){ cout &lt;&lt; <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">HelloWorld--\n</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">; }
+</span><span style="color: rgba(0, 0, 255, 1)">private</span><span style="color: rgba(0, 0, 0, 1)">:
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> d;
+};
+</span><span style="color: rgba(0, 0, 255, 1)">int</span><span style="color: rgba(0, 0, 0, 1)"> main()
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span> a = <span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">;
+    cout </span>&lt;&lt; typeid(a).name() &lt;&lt;<span style="color: rgba(0, 0, 0, 1)"> endl;
+    A objA;
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">打印出class A  </span>
+    cout &lt;&lt; typeid(objA).name() &lt;&lt;<span style="color: rgba(0, 0, 0, 1)"> endl;
+    B objB;
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">打印出class B  </span>
+    cout &lt;&lt; typeid(objB).name() &lt;&lt;<span style="color: rgba(0, 0, 0, 1)"> endl;
+    C objC;
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">打印出class C  </span>
+    cout &lt;&lt; typeid(objC).name() &lt;&lt;<span style="color: rgba(0, 0, 0, 1)"> endl;
+    
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">以下是多态在VC 6.0编译器不支持，但是在GCC以及微软更高版本的编译器却都是
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">支持的，且是在运行时候来确定类型的，而不是在编译器,会打印出class c</span>
+    B *ptrB=<span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> C();
+    cout</span>&lt;&lt;typeid(*ptrB).name()&lt;&lt;<span style="color: rgba(0, 0, 0, 1)">endl;
+    
+    A </span>*ptrA = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> D();
+    </span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">打印出class A而不是class D  </span>
+    cout &lt;&lt; typeid(*ptrA).name() &lt;&lt;<span style="color: rgba(0, 0, 0, 1)"> endl;
+    </span><span style="color: rgba(0, 0, 255, 1)">return</span> <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>运行截图：<br><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/702782-20160424160750335-464535503.jpg" alt=""></p>
+<h3>dynamic_cast强制转换运算符</h3>
+<p>该转换符用于将一个指向派生类的基类指针或引用转换为派生类的指针或引用，注意dynamic_cast转换符只能用于含有虚函数的类，其表达式为dynamic_cast&lt;类型&gt;(表达式)，其中的类型是指把表达式要转换成的目标类型，比如含有虚函数的基类B和从基类B派生出的派生类D，则B *pb; D *pd, md; pb=&amp;md; pd=dynamic&lt;D*&gt;(pb); 最后一条语句表示把指向派生类D的基类指针pb转换为派生类D的指针，然后将这个指针赋给派生类D的指针pd，有人可能会觉得这样做没有意义，既然指针pd要指向派生类为什么不pd=&amp;md;这样做更直接呢？</p>
+<p>因为有些时候我们需要强制转换，比如如果指向派生类的基类指针B想访问派生类D中的除虚函数之外的成员时就需要把该指针转换为指向派生类D的指针，以达到访问派生类D中特有的成员的目的，比如派生类D中含有特有的成员函数g()，这时可以这样来访问该成员dynamic_cast&lt;D*&gt;(pb)-&gt;g();因为dynamic_cast转换后的结果是一个指向派生类的指针，所以可以这样访问派生类中特有的成员。但是该语句不影响原来的指针的类型，即基类指针pb仍然是指向基类B的。</p>
+<p>dynamic_cast转换符只能用于指针或者引用。dynamic_cast转换符只能用于含有虚函数的类。dynamic_cast转换操作符在执行类型转换时首先将检查能否成功转换，如果能成功转换则转换之，如果转换失败，如果是指针则反回一个0值，如果是转换的是引用，则抛出一个bad_cast异常，所以在使用dynamic_cast转换之间应使用if语句对其转换成功与否进行测试，比如pd=dynamic_cast&lt;D*&gt;(pb); if(pd){…}else{…}，或者这样测试if(dynamic_cast&lt;D*&gt;(pb)){…}else{…}。</p>
+<p>对于其它的强制转换运算符：static_cast，reinterpret_cast，const_cast，请阅读<a id="cb_post_title_url" href="http://www.cnblogs.com/tgycoder/p/5303701.html">C++中“强制转换”的四大天王</a>。</p>
+</div>
+<div id="MySignature" style="display: block;">写代码是一种艺术，甚于蒙娜丽莎的微笑。</div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/tgycoder/category/644657.html" target="_blank">C++基础概念</a></div>
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/tgycoder/tag/RTTI/">RTTI</a></div>
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(5427303,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;1ef0aebb-3181-e411-b908-9dcfd8948a71&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/tgycoder/" target="_blank"><img src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/20150108201714.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/tgycoder/">RunningSnail</a><br>
+            <a href="https://home.cnblogs.com/u/tgycoder/followees/">关注 - 14</a><br>
+            <a href="https://home.cnblogs.com/u/tgycoder/followers/">粉丝 - 154</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;1ef0aebb-3181-e411-b908-9dcfd8948a71&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(5427303,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">1</span>
+    </div>
+    <div class="buryit" onclick="votePost(5427303,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/tgycoder/p/5426628.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/tgycoder/p/5426628.html" title="发布于 2016-04-24 11:39">C++对象模型详解</a>
+    <br>
+    <a href="https://www.cnblogs.com/tgycoder/p/5427962.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/tgycoder/p/5427962.html" title="发布于 2016-04-24 19:55">悟</a>
+
+</div>
+</div>
+        </div>
+	
+        <div class="postfoot">
+            posted on 
+<span id="post-date">2016-04-24 16:17</span>&nbsp;
+<a href="https://www.cnblogs.com/tgycoder/">RunningSnail</a>&nbsp;
+阅读(<span id="post_view_count">13333</span>)&nbsp;
+评论(<span id="post_comment_count">1</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=5427303" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(5427303);return false;">收藏</a>
+        </div>
+    </div>
+</div>
+
+<script src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/highlight.min.js.下载"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 208262, cb_blogApp = 'tgycoder', cb_blogUserGuid = '1ef0aebb-3181-e411-b908-9dcfd8948a71';
+    var cb_entryId = 5427303, cb_entryCreatedDate = '2016-04-24 16:17', cb_postType = 1;
+    updatePostStats(
+        [cb_entryId],
+        function(id, count) { $("#post_view_count").text(count) },
+        function(id, count) { $("#post_comment_count").text(count) })
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+</script>
+<a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/tgycoder/p/5427303.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/tgycoder/p/5427303.html#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login(&#39;!comments&#39;);">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a href="http://www.uccpsoft.com/index.htm" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-ucancode&#39;)">【推荐】大型组态、工控、仿真、CAD\GIS 50万行VC++源码免费下载!</a><br><a href="https://brands.cnblogs.com/huawei" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-华为专区&#39;)">【推荐】创新 聚力 融合，HMS Core.Sparkle 影音娱乐创新沙龙，邀您参加</a><br><a href="http://www.moojnn.com/?source=bokeyuan" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-魔镜&#39;)">【推荐】限时秒杀！国云大数据魔镜，企业级云分析平台</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+        <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;" data-google-query-id="CIS08u3TnvACFZTITAIdvhMFvQ"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C1_0" width="300" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" style="border: 0px; vertical-align: bottom;" data-google-container-id="1" data-load-complete="true" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/saved_resource.html"></iframe></div></div>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card"><b>园子动态</b>：<br>· <a href="https://www.cnblogs.com/cmt/p/14585828.html" target="_blank">致园友们的一封检讨书：都是我们的错</a><br>· <a href="https://www.cnblogs.com/cmt/p/14595262.html" target="_blank">数据库实例 CPU 100% 引发全站故障</a><br>· <a href="https://www.cnblogs.com/cmt/p/14217355.html" target="_blank">发起一个开源项目：博客引擎 fluss</a><br></div></div>
+    <div id="cnblogs_c2" class="under-post-card">
+        <div id="div-gpt-ad-1592366332455-0" style="width: 468px; height: 60px;" data-google-query-id="CNO78e3TnvACFZTITAIdvhMFvQ"><div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C2_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C2_0" width="468" height="60" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" data-google-container-id="2" style="border: 0px; vertical-align: bottom;" data-load-complete="true" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/saved_resource(1).html"></iframe></div></div>
+    </div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>最新新闻</b>：
+    <br>
+ ·          <a href="https://news.cnblogs.com/n/691837/" target="_blank">市场消息：欧盟本周将以反竞争行为为由起诉苹果</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/691836/" target="_blank">风口浪尖上的特斯拉，财报亮眼却耐人寻味</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/691835/" target="_blank">调查发现iPhone用户群体不喜欢可折叠手机的比例最高</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/691834/" target="_blank">美团或被罚7亿美元？小餐饮店主“求饶”：佣金不要再涨了</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/691833/" target="_blank">和Google们一起定义开放式办公室的那家设计公司，现在说：开放式办公室已死</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+       var commentManager = new blogCommentManager();
+       commentManager.renderComments(0);
+       fixPostBody();
+       deliverBigBanner();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);       deliverT2();
+       deliverC1C2();
+       loadNewsAndKb();
+       loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);       LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+       GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+       loadOptUnderPost();
+       GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+
+
+
+</td></tr>
+</tbody></table>
+<p id="footer">
+	Copyright @
+	2021 RunningSnail
+<br><span id="poweredby">Powered by .NET 5.0 on Kubernetes</span>
+<br>
+	Powered by:
+	<a href="http://scottwater.com/blog" target="_blank">.Text</a> and 
+	<a href="http://asp.net/" target="_blank">ASP.NET</a>
+	<br>
+	Theme by: <a href="http://www.dotnetmonster.com/" target="_blank">.NET Monster</a>
+</p>
+
+
+
+
+    <div id="page_end_html">
+        <div id="clustrmaps-widget"></div>
+    </div>
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8L-rpLgFVEJMgssCVvNUAjt0GRbHI6kipdGQAaeIJxb_vL1XaR3nxMJIJ6vwayQzbdSbGbAgMIqdEU749k4UGHn4OY9zDydBlHS_CkWTjpowZQvPeYd_lW6OLqSecZoGbBlfuOXy_GBeU42p8-boIbk">
+
+
+<iframe id="google_osd_static_frame_8920475351821" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;" src="./C++中的RTTI机制解析 - RunningSnail - 博客园_files/saved_resource(2).html"></iframe></body></html>
